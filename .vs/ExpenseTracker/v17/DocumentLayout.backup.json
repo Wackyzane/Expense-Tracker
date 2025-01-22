@@ -3,7 +3,11 @@
   "WorkspaceRootPath": "C:\\Users\\karls\\source\\repos\\ExpenseTracker\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{17510EAC-0374-4E14-9581-4AA371575798}|ExpenseTracker\\ExpenseTracker.csproj|c:\\users\\karls\\source\\repos\\expensetracker\\expensetracker\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "AbsoluteMoniker": "D:0:0:{17510EAC-0374-4E14-9581-4AA371575798}|ExpenseTracker\\ExpenseTracker.csproj|c:\\users\\karls\\source\\repos\\expensetracker\\expensetracker\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{17510EAC-0374-4E14-9581-4AA371575798}|ExpenseTracker\\ExpenseTracker.csproj|solutionrelative:expensetracker\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{17510EAC-0374-4E14-9581-4AA371575798}|ExpenseTracker\\ExpenseTracker.csproj|C:\\Users\\karls\\source\\repos\\ExpenseTracker\\expensetracker\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{17510EAC-0374-4E14-9581-4AA371575798}|ExpenseTracker\\ExpenseTracker.csproj|solutionrelative:expensetracker\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     }
   ],
@@ -19,13 +23,27 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "Form1.cs",
+              "DocumentMoniker": "C:\\Users\\karls\\source\\repos\\ExpenseTracker\\ExpenseTracker\\Form1.cs",
+              "RelativeDocumentMoniker": "ExpenseTracker\\Form1.cs",
+              "ToolTip": "C:\\Users\\karls\\source\\repos\\ExpenseTracker\\ExpenseTracker\\Form1.cs",
+              "RelativeToolTip": "ExpenseTracker\\Form1.cs",
+              "ViewState": "AgIAACIAAAAAAAAAAAAmwDUAAABPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-20T19:41:23.022Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "Form1.cs [Design]",
               "DocumentMoniker": "C:\\Users\\karls\\source\\repos\\ExpenseTracker\\ExpenseTracker\\Form1.cs",
               "RelativeDocumentMoniker": "ExpenseTracker\\Form1.cs",
               "ToolTip": "C:\\Users\\karls\\source\\repos\\ExpenseTracker\\ExpenseTracker\\Form1.cs [Design]",
               "RelativeToolTip": "ExpenseTracker\\Form1.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-20T19:35:12.597Z",
+              "WhenOpened": "2025-01-21T02:43:26.591Z",
               "EditorCaption": " [Design]"
             }
           ]
