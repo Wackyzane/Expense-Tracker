@@ -1,14 +1,22 @@
 namespace ExpenseTracker
 {
     using System.Data;
+    using System.Diagnostics;
     using System.Runtime.InteropServices;
+
+    using Xceed.Document.NET;
+    using Xceed.Words.NET;
+    using ClosedXML.Excel;
+    using PdfSharp.Pdf;
+    using PdfSharp.Drawing;
+
     public partial class Form1 : Form
     {
         public const int WM_NCLBUTTONDOWN = 0xA1;
         public const int HT_CAPTION = 0x2;
 
         /// <summary>
-        /// DllImportAttribute allows you to call on unmanaged code from outside the program.
+        /// DllImportAttribute allows you to call on unmanaged code from outside the program. Specifically dll files.
         /// user32.dll has most for the core Windows API in System32 Folder
         /// Windows forms uses user32.dll to create its form
         /// We are bypassing working with Windows Forms here to directly use the function it uses to move the window as a whole
@@ -17,6 +25,7 @@ namespace ExpenseTracker
         public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
         [DllImportAttribute("user32.dll")]
         public static extern bool ReleaseCapture();
+        private DataTable dt;
 
         public Form1()
         {
@@ -26,7 +35,7 @@ namespace ExpenseTracker
 
         private void CreateTable()
         {
-            DataTable dt = new DataTable();
+            dt = new DataTable();
             // Add Columns
             dt.Columns.Add("Months", typeof(string));
             dt.Columns.Add("Rent", typeof(double));
@@ -34,26 +43,36 @@ namespace ExpenseTracker
             dt.Columns.Add("Subscriptions", typeof(double));
             dt.Columns.Add("Groceries", typeof(double));
             dt.Columns.Add("Other", typeof(double));
-            dt.Columns.Add("Total", typeof(double));
+            dt.Columns.Add("Total Expenses", typeof(double));
+            dt.Columns.Add("Income", typeof(double));
+            dt.Columns.Add("Gross Income", typeof(double));
 
             // Add Rows
-            dt.Rows.Add("January", 0, 0, 0, 0, 0, 0);
-            dt.Rows.Add("February", 0, 0, 0, 0, 0, 0);
-            dt.Rows.Add("March", 0, 0, 0, 0, 0, 0);
-            dt.Rows.Add("April", 0, 0, 0, 0, 0, 0);
-            dt.Rows.Add("May", 0, 0, 0, 0, 0, 0);
-            dt.Rows.Add("June", 0, 0, 0, 0, 0, 0);
-            dt.Rows.Add("July", 0, 0, 0, 0, 0, 0);
-            dt.Rows.Add("August", 0, 0, 0, 0, 0, 0);
-            dt.Rows.Add("September", 0, 0, 0, 0, 0, 0);
-            dt.Rows.Add("October", 0, 0, 0, 0, 0, 0);
-            dt.Rows.Add("November", 0, 0, 0, 0, 0, 0);
-            dt.Rows.Add("December", 0, 0, 0, 0, 0, 0);
-            dt.Rows.Add("Total", 0, 0, 0, 0, 0, 0);
+            dt.Rows.Add("January", 0, 0, 0, 0, 0, 0, 0, 0);
+            dt.Rows.Add("February", 0, 0, 0, 0, 0, 0, 0, 0);
+            dt.Rows.Add("March", 0, 0, 0, 0, 0, 0, 0, 0);
+            dt.Rows.Add("April", 0, 0, 0, 0, 0, 0, 0, 0);
+            dt.Rows.Add("May", 0, 0, 0, 0, 0, 0, 0, 0);
+            dt.Rows.Add("June", 0, 0, 0, 0, 0, 0, 0, 0);
+            dt.Rows.Add("July", 0, 0, 0, 0, 0, 0, 0, 0);
+            dt.Rows.Add("August", 0, 0, 0, 0, 0, 0, 0, 0);
+            dt.Rows.Add("September", 0, 0, 0, 0, 0, 0, 0, 0);
+            dt.Rows.Add("October", 0, 0, 0, 0, 0, 0, 0, 0);
+            dt.Rows.Add("November", 0, 0, 0, 0, 0, 0, 0, 0);
+            dt.Rows.Add("December", 0, 0, 0, 0, 0, 0, 0, 0);
+
             DataGrid.DataSource = dt;
-            DataGrid.AllowUserToAddRows = false;
-            DataGrid.AllowUserToDeleteRows = false;
-            DataGrid.AllowUserToOrderColumns = true;
+
+            DisableSorting();
+
+        }
+
+        private void DisableSorting()
+        {
+            foreach (DataGridViewColumn column in DataGrid.Columns)
+            {
+                column.SortMode = DataGridViewColumnSortMode.NotSortable;
+            }
         }
 
         private void ExitButtonClick(object sender, EventArgs e)
@@ -90,24 +109,9 @@ namespace ExpenseTracker
             File.BackColor = Color.Transparent;
         }
 
-        private void AddColumnClick(object sender, EventArgs e)
-        {
-            AddColumnName.Text = string.Empty;
-            CreateTable();
-        }
-
-        private void AddColumnEnter(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                AddColumnClick(sender, e);
-            }
-        }
-
         private void EditTable(object sender, DataGridViewCellEventArgs e)
         {
             RowTotal(DataGrid.Rows[e.RowIndex]);
-            ColumnTotal(DataGrid.Columns[e.ColumnIndex]);
         }
 
         private void RowTotal(DataGridViewRow row)
@@ -116,19 +120,88 @@ namespace ExpenseTracker
 
             for (int i = 0; i < DataGrid.Columns.Count; i++)
             {
-                if (i == DataGrid.Columns.Count - 1) continue;
+                if (i == DataGrid.Columns.Count - 3) break;
                 if (double.TryParse(row.Cells[i].Value?.ToString(), out double cellValue))
                 {
                     total += cellValue;
                 }
             }
 
-            row.Cells["Total"].Value = total.ToString();
+            row.Cells["Total Expenses"].Value = total.ToString();
+
+            CalculateGrossIncome(row, total);
         }
 
-        private void ColumnTotal(DataGridViewColumn column)
+        private void CalculateGrossIncome(DataGridViewRow row, double expenses)
         {
-            
+            double.TryParse(row.Cells["Income"].Value?.ToString(), out double income);
+            row.Cells["Gross Income"].Value = income - expenses;
+
+            if (income < expenses)
+                row.Cells["Gross Income"].Style.BackColor = Color.Red;
+            else
+                row.Cells["Gross Income"].Style.BackColor = Color.Green;
+        }
+
+        private void File_Click(object sender, EventArgs e)
+        {
+            FileMenu.Show(File, new Point(0, File.Height));
+        }
+
+        private void ExportToWord_Click(object sender, EventArgs e)
+        {
+            string filePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\ExpenseTracker.docx";
+
+            using (var document = DocX.Create(filePath))
+            {
+                document.InsertParagraph("Expense Tracker\n").FontSize(18).Bold().Alignment = Alignment.center;
+
+                var table = document.AddTable(DataGrid.RowCount + 1, DataGrid.ColumnCount);
+                table.Design = TableDesign.MediumGrid1Accent1;
+
+                for (int i = 0; i < DataGrid.ColumnCount; i++)
+                {
+                    table.Rows[0].Cells[i].Paragraphs[0].Append(DataGrid.Columns[i].HeaderText);
+                }
+
+                for (int r = 0; r < DataGrid.RowCount; r++)
+                {
+                    for (int c = 0; c < DataGrid.ColumnCount; c++)
+                    {
+                        table.Rows[r + 1].Cells[c].Paragraphs[0].Append(DataGrid.Rows[r].Cells[c].Value?.ToString());
+                    }
+                }
+
+                document.InsertTable(table);
+                document.Save();
+                Process.Start("explorer.exe", "/open, " + filePath);
+            }
+            MessageBox.Show($"Word document successfully created to {filePath}");
+        }
+
+        private void ExportToExcel_Click(object sender, EventArgs e)
+        {
+            string filePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\ExpenseTracker.xlsx";
+
+            using (var workBook = new XLWorkbook())
+            {
+                var worksheet = workBook.Worksheets.Add("Sheet1");
+
+                worksheet.Cell(1, 1).InsertTable(dt);
+
+                worksheet.Columns().AdjustToContents();
+
+                workBook.SaveAs(filePath);
+            }
+            MessageBox.Show($"Excel Document Successfully Created to {filePath}");
+            Process.Start("explorer.exe", "/open, " + filePath);
+        }
+
+        private void DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            DataGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = 0;
+            MessageBox.Show("Please Enter Numbers Only!", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            e.ThrowException = false;
         }
     }
 }

@@ -28,12 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
             ExitButton = new Label();
             File = new Label();
+            FileMenu = new ContextMenuStrip(components);
+            ExportMenuItem = new ToolStripMenuItem();
+            wordToolStripMenuItem = new ToolStripMenuItem();
+            excelToolStripMenuItem = new ToolStripMenuItem();
             WindowDragBox = new Panel();
             DataGrid = new DataGridView();
-            AddColumnButton = new Button();
-            AddColumnName = new TextBox();
+            FileMenu.SuspendLayout();
             WindowDragBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)DataGrid).BeginInit();
             SuspendLayout();
@@ -56,6 +64,7 @@
             // File
             // 
             File.AutoSize = true;
+            File.ContextMenuStrip = FileMenu;
             File.Font = new Font("Segoe UI", 12F);
             File.ForeColor = Color.FromArgb(161, 161, 161);
             File.Location = new Point(10, 7);
@@ -63,8 +72,36 @@
             File.Size = new Size(34, 21);
             File.TabIndex = 1;
             File.Text = "File";
+            File.Click += File_Click;
             File.MouseEnter += FileMouseEnter;
             File.MouseLeave += FileMouseLeave;
+            // 
+            // FileMenu
+            // 
+            FileMenu.Items.AddRange(new ToolStripItem[] { ExportMenuItem });
+            FileMenu.Name = "FileMenu";
+            FileMenu.Size = new Size(109, 26);
+            // 
+            // ExportMenuItem
+            // 
+            ExportMenuItem.DropDownItems.AddRange(new ToolStripItem[] { wordToolStripMenuItem, excelToolStripMenuItem });
+            ExportMenuItem.Name = "ExportMenuItem";
+            ExportMenuItem.Size = new Size(108, 22);
+            ExportMenuItem.Text = "Export";
+            // 
+            // wordToolStripMenuItem
+            // 
+            wordToolStripMenuItem.Name = "wordToolStripMenuItem";
+            wordToolStripMenuItem.Size = new Size(103, 22);
+            wordToolStripMenuItem.Text = ".docx";
+            wordToolStripMenuItem.Click += ExportToWord_Click;
+            // 
+            // excelToolStripMenuItem
+            // 
+            excelToolStripMenuItem.Name = "excelToolStripMenuItem";
+            excelToolStripMenuItem.Size = new Size(103, 22);
+            excelToolStripMenuItem.Text = ".xlsx";
+            excelToolStripMenuItem.Click += ExportToExcel_Click;
             // 
             // WindowDragBox
             // 
@@ -79,32 +116,46 @@
             // 
             // DataGrid
             // 
+            DataGrid.AllowUserToAddRows = false;
+            DataGrid.AllowUserToDeleteRows = false;
+            DataGrid.AllowUserToOrderColumns = true;
+            DataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             DataGrid.BackgroundColor = Color.FromArgb(31, 31, 31);
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = Color.FromArgb(31, 31, 31);
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 12F);
+            dataGridViewCellStyle1.ForeColor = Color.FromArgb(31, 31, 31);
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = Color.FromArgb(31, 31, 31);
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            DataGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             DataGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = Color.FromArgb(31, 31, 31);
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle2.ForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
+            DataGrid.DefaultCellStyle = dataGridViewCellStyle2;
             DataGrid.GridColor = Color.FromArgb(161, 161, 161);
             DataGrid.Location = new Point(12, 71);
             DataGrid.Name = "DataGrid";
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = Color.FromArgb(31, 31, 31);
+            dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle3.ForeColor = SystemColors.Window;
+            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
+            DataGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle4.BackColor = Color.FromArgb(31, 31, 31);
+            dataGridViewCellStyle4.ForeColor = Color.White;
+            DataGrid.RowsDefaultCellStyle = dataGridViewCellStyle4;
             DataGrid.Size = new Size(776, 367);
             DataGrid.TabIndex = 2;
             DataGrid.CellEndEdit += EditTable;
-            // 
-            // AddColumnButton
-            // 
-            AddColumnButton.Location = new Point(12, 42);
-            AddColumnButton.Name = "AddColumnButton";
-            AddColumnButton.Size = new Size(84, 23);
-            AddColumnButton.TabIndex = 3;
-            AddColumnButton.Text = "Add Column";
-            AddColumnButton.UseVisualStyleBackColor = true;
-            AddColumnButton.Click += AddColumnClick;
-            // 
-            // AddColumnName
-            // 
-            AddColumnName.Location = new Point(102, 42);
-            AddColumnName.Name = "AddColumnName";
-            AddColumnName.Size = new Size(100, 23);
-            AddColumnName.TabIndex = 4;
-            AddColumnName.KeyDown += AddColumnEnter;
+            DataGrid.DataError += DataError;
             // 
             // Form1
             // 
@@ -112,18 +163,16 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(31, 31, 31);
             ClientSize = new Size(800, 450);
-            Controls.Add(AddColumnName);
-            Controls.Add(AddColumnButton);
             Controls.Add(DataGrid);
             Controls.Add(WindowDragBox);
             FormBorderStyle = FormBorderStyle.None;
             Name = "Form1";
             Text = "Form1";
+            FileMenu.ResumeLayout(false);
             WindowDragBox.ResumeLayout(false);
             WindowDragBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)DataGrid).EndInit();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
@@ -132,7 +181,9 @@
         private Label File;
         private Panel WindowDragBox;
         private DataGridView DataGrid;
-        private Button AddColumnButton;
-        private TextBox AddColumnName;
+        private ContextMenuStrip FileMenu;
+        private ToolStripMenuItem ExportMenuItem;
+        private ToolStripMenuItem wordToolStripMenuItem;
+        private ToolStripMenuItem excelToolStripMenuItem;
     }
 }
